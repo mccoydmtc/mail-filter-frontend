@@ -10,69 +10,104 @@
   <style>
     * { font-family: 'Outfit', 'Century Gothic', sans-serif; }
     [x-cloak] { display: none !important; }
-    :root { --neon: #00f3ff; --pink: #ff00de; }
     body {
       background: #050510;
-      background-image:
-        radial-gradient(at 0% 0%, hsla(253,40%,10%,1) 0, transparent 60%),
-        radial-gradient(at 100% 0%, hsla(339,49%,20%,1) 0, transparent 60%);
+      background-image: radial-gradient(at 0% 0%, hsla(253,40%,10%,1) 0, transparent 60%), radial-gradient(at 100% 0%, hsla(339,49%,20%,1) 0, transparent 60%);
       min-height: 100vh; color: #e2e8f0;
     }
     body::before {
       content: ""; position: fixed; inset: 0;
-      background-image:
-        linear-gradient(rgba(0,243,255,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,243,255,0.04) 1px, transparent 1px);
+      background-image: linear-gradient(rgba(0,243,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,243,255,0.04) 1px, transparent 1px);
       background-size: 40px 40px; pointer-events: none; z-index: 0;
     }
-    .glass { background: rgba(15,15,30,0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
-    .neon { color: var(--neon); text-shadow: 0 0 10px rgba(0,243,255,0.5); }
-    .btn-cyan { background: rgba(0,243,255,0.1); border: 1px solid var(--neon); color: var(--neon); transition: all .3s; }
-    .btn-cyan:hover:not(:disabled) { background: var(--neon); color: #000; box-shadow: 0 0 20px var(--neon); }
-    .btn-pink { background: rgba(255,0,222,0.1); border: 1px solid var(--pink); color: var(--pink); transition: all .3s; }
-    .btn-pink:hover:not(:disabled) { background: var(--pink); color: #fff; box-shadow: 0 0 20px var(--pink); }
+    .glass { background: rgba(15,15,30,0.75); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.08); }
+    .neon { color: #00f3ff; text-shadow: 0 0 10px rgba(0,243,255,0.5); }
+    .btn-cyan { background: rgba(0,243,255,0.1); border: 1px solid #00f3ff; color: #00f3ff; transition: all .3s; }
+    .btn-cyan:hover:not(:disabled) { background: #00f3ff; color: #000; box-shadow: 0 0 20px #00f3ff; }
+    .btn-pink { background: rgba(255,0,222,0.1); border: 1px solid #ff00de; color: #ff00de; transition: all .3s; }
+    .btn-pink:hover:not(:disabled) { background: #ff00de; color: #fff; box-shadow: 0 0 20px #ff00de; }
     .btn-gray { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #aaa; transition: all .3s; }
     .btn-gray:hover:not(:disabled) { background: rgba(255,255,255,0.1); color: #fff; }
     :disabled { opacity: .4; cursor: not-allowed; }
-    input, textarea { background: rgba(0,0,0,0.5) !important; border: 1px solid #333 !important; color: #fff !important; }
-    input:focus, textarea:focus { border-color: var(--neon) !important; outline: none; box-shadow: 0 0 10px rgba(0,243,255,0.2) !important; }
+    input, textarea { background: rgba(0,0,0,0.5) !important; border: 1px solid #333 !important; color: #fff !important; transition: all .3s; }
+    input:focus, textarea:focus { border-color: #00f3ff !important; outline: none; box-shadow: 0 0 10px rgba(0,243,255,0.2) !important; }
     tbody tr:hover { background: rgba(0,243,255,0.04); }
+    @keyframes gridMove {
+      0% { transform: perspective(600px) rotateX(60deg) translateY(0) translateZ(-200px); }
+      100% { transform: perspective(600px) rotateX(60deg) translateY(40px) translateZ(-200px); }
+    }
+    .grid-anim { animation: gridMove 20s linear infinite; }
   </style>
 </head>
 <body x-data="app()" x-init="init()">
-<div class="relative z-10 max-w-7xl mx-auto px-4 py-6">
+
+<!-- ===== LOGIN PAGE ===== -->
+<div x-show="page==='login'" x-cloak class="relative z-10 min-h-screen flex items-center justify-center p-4">
+  <div style="position:fixed;inset:0;overflow:hidden;z-index:0;opacity:0.3">
+    <div class="grid-anim" style="position:absolute;width:200%;height:200%;background-image:linear-gradient(rgba(0,243,255,0.15) 1px,transparent 1px),linear-gradient(90deg,rgba(0,243,255,0.15) 1px,transparent 1px);background-size:40px 40px;transform:perspective(600px) rotateX(60deg) translateY(-100px) translateZ(-200px)"></div>
+  </div>
+  <div class="glass rounded-3xl p-10 w-full max-w-md relative z-10" style="border-top:2px solid rgba(0,243,255,0.5);border-bottom:2px solid rgba(255,0,222,0.5)">
+    <div class="text-center mb-8">
+      <div class="inline-flex p-4 rounded-full bg-black/40 border border-cyan-900/50 mb-4 shadow-lg shadow-cyan-500/20">
+        <svg class="w-10 h-10 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+      </div>
+      <h1 class="text-3xl font-black text-white tracking-wider">CAD University</h1>
+      <p class="text-xs neon font-bold tracking-widest uppercase mt-1">Mail Filter Administration</p>
+    </div>
+    <div class="space-y-5">
+      <div>
+        <label class="block text-xs text-cyan-600 mb-2 ml-1 tracking-widest">IDENTIFICATION</label>
+        <input type="password" x-model="password" @keydown.enter="login()" placeholder="ENTER PASSCODE"
+          class="w-full px-4 py-3 rounded-xl text-center tracking-widest text-lg">
+      </div>
+      <button @click="login()" :disabled="loggingIn" class="btn-cyan w-full py-3.5 rounded-xl font-black text-sm tracking-widest uppercase">
+        <span x-text="loggingIn ? 'VERIFYING...' : 'AUTHENTICATE'"></span>
+      </button>
+      <p x-show="loginError" class="text-red-400 text-center text-sm" x-text="loginError"></p>
+    </div>
+    <p class="text-center text-xs text-gray-700 mt-8">Powered by dmtc 2026 (c) • ENCRYPTED CONNECTION</p>
+  </div>
+</div>
+
+<!-- ===== DASHBOARD PAGE ===== -->
+<div x-show="page==='dashboard'" x-cloak class="relative z-10 max-w-7xl mx-auto px-4 py-6">
 
   <!-- NAV -->
   <nav class="glass rounded-2xl px-6 py-4 mb-8 flex flex-wrap justify-between items-center gap-4">
-    <div class="flex items-center gap-4">
-      <span class="text-2xl font-black neon tracking-wider">🛡️ Filter Admin</span>
-      <span class="text-xs font-mono px-2 py-0.5 border border-cyan-900 text-cyan-700 rounded">v4.0</span>
-      <div class="hidden md:flex gap-2">
+    <div class="flex items-center gap-4 flex-wrap">
+      <div class="flex items-center gap-2">
+        <span class="text-xl font-black neon tracking-wider">🛡️ Filter Admin</span>
+        <span class="text-xs font-mono px-2 py-0.5 border border-cyan-900 text-cyan-800 rounded">v4.0</span>
+      </div>
+      <div class="hidden md:flex gap-1.5">
         <template x-for="tab in tabs" :key="tab.id">
           <button @click="switchTab(tab.id)"
-            :class="currentTab===tab.id?'bg-cyan-500/20 text-cyan-400 border-cyan-500':'text-gray-500 hover:text-gray-200 border-transparent'"
-            class="px-3 py-1.5 rounded-lg text-sm font-semibold border transition-all" x-text="tab.name"></button>
+            :class="currentTab===tab.id?'bg-cyan-500/20 text-cyan-400 border-cyan-500':'text-gray-500 hover:text-gray-300 border-transparent'"
+            class="px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all" x-text="tab.name"></button>
         </template>
       </div>
     </div>
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-2">
       <button @click="()=>importFromKV()" :disabled="importing||deploying" class="btn-gray px-3 py-2 rounded-lg text-xs font-bold">
         <span x-text="importing?'⏳ 匯入中...':'📥 IMPORT FROM KV'"></span>
       </button>
       <button @click="deployToKV()" :disabled="importing||deploying" class="btn-pink px-3 py-2 rounded-lg text-xs font-bold">
         <span x-text="deploying?'⏳ 部署中...':'🚀 DEPLOY TO KV'"></span>
       </button>
-      <button @click="logout()" class="text-gray-600 hover:text-red-400 text-xs font-bold tracking-widest transition-colors">LOGOUT</button>
+      <button @click="logout()" class="text-gray-600 hover:text-red-400 text-xs font-bold tracking-widest transition-colors ml-2">LOGOUT</button>
     </div>
   </nav>
 
-  <!-- MAIN -->
+  <!-- HEADER -->
   <div class="flex flex-col sm:flex-row justify-between items-end gap-4 mb-6">
     <div>
-      <h1 class="text-3xl font-bold text-white flex items-center gap-2">
+      <h2 class="text-3xl font-bold text-white flex items-center gap-2">
         <span class="neon">::</span> <span x-text="currentTabName"></span>
-      </h1>
-      <p class="text-sm text-gray-500 mt-1 font-mono">TOTAL: <span class="text-white font-bold" x-text="pagination.total">0</span></p>
+      </h2>
+      <p class="text-sm text-gray-500 mt-1 font-mono">
+        TOTAL: <span class="text-white font-bold" x-text="pagination.total">0</span> &nbsp;|&nbsp;
+        PAGE: <span x-text="pagination.page"></span> / <span x-text="pagination.totalPages"></span>
+      </p>
     </div>
     <div class="flex gap-3 w-full sm:w-auto">
       <div class="relative flex-1 sm:w-72">
@@ -82,7 +117,7 @@
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
         </button>
       </div>
-      <button @click="showAddModal=true" class="btn-cyan px-5 py-2.5 rounded-xl text-sm font-bold">+ 新增</button>
+      <button @click="showAddModal=true" class="btn-cyan px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap">+ 新增規則</button>
     </div>
   </div>
 
@@ -95,7 +130,7 @@
             <th class="px-6 py-4 text-xs font-bold neon uppercase tracking-wider w-16">ID</th>
             <th class="px-6 py-4 text-xs font-bold neon uppercase tracking-wider" x-show="isSearching">TYPE</th>
             <th class="px-6 py-4 text-xs font-bold neon uppercase tracking-wider">VALUE</th>
-            <th class="px-6 py-4 text-xs font-bold neon uppercase tracking-wider w-40">DATE / NOTE</th>
+            <th class="px-6 py-4 text-xs font-bold neon uppercase tracking-wider w-44">DATE / NOTE</th>
             <th class="px-6 py-4 text-right text-xs font-bold neon uppercase tracking-wider w-20">ACTION</th>
           </tr>
         </thead>
@@ -104,10 +139,10 @@
             <tr class="transition-colors">
               <td class="px-6 py-3.5 text-sm text-gray-600 font-mono" x-text="item.id"></td>
               <td class="px-6 py-3.5 text-xs neon" x-show="isSearching" x-text="item.type"></td>
-              <td class="px-6 py-3.5 text-sm text-white font-medium" x-text="item.value"></td>
+              <td class="px-6 py-3.5 text-sm text-white font-medium tracking-wide" x-text="item.value"></td>
               <td class="px-6 py-3.5 text-sm text-gray-500" x-text="item.note"></td>
               <td class="px-6 py-3.5 text-right">
-                <button @click="deleteItem(item.id)" class="text-pink-600 hover:text-pink-400 text-xs font-bold transition-colors">DELETE</button>
+                <button @click="deleteItem(item.id)" class="text-pink-700 hover:text-pink-400 text-xs font-bold transition-colors tracking-widest">DELETE</button>
               </td>
             </tr>
           </template>
@@ -118,7 +153,7 @@
       </table>
     </div>
     <div class="px-6 py-3 flex justify-between items-center border-t border-white/5 bg-black/10" x-show="!isSearching && pagination.totalPages > 1">
-      <span class="text-xs text-gray-600 font-mono">PAGE <span class="text-white" x-text="pagination.page"></span> / <span x-text="pagination.totalPages"></span></span>
+      <span class="text-xs text-gray-600 font-mono">PAGE <span class="text-white" x-text="pagination.page"></span> OF <span x-text="pagination.totalPages"></span></span>
       <div class="flex gap-2">
         <button @click="changePage(pagination.page-1)" :disabled="pagination.page<=1" class="btn-gray px-3 py-1 rounded text-xs">&lt;</button>
         <button @click="changePage(pagination.page+1)" :disabled="pagination.page>=pagination.totalPages" class="btn-gray px-3 py-1 rounded text-xs">&gt;</button>
@@ -128,10 +163,10 @@
 
   <!-- ADD MODAL -->
   <div x-show="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" x-cloak>
-    <div class="glass rounded-2xl p-8 w-full max-w-lg shadow-2xl border-cyan-900/30">
-      <h3 class="text-xl font-bold text-white mb-2">新增過濾規則</h3>
-      <p class="text-xs text-gray-500 mb-4">每行輸入一個項目，系統會自動去重</p>
-      <textarea x-model="newContent" rows="6" placeholder="spam@example.com&#10;badactor@domain.com" class="w-full px-4 py-3 rounded-xl text-sm"></textarea>
+    <div class="glass rounded-2xl p-8 w-full max-w-lg shadow-2xl">
+      <h3 class="text-xl font-bold text-white mb-1">新增過濾規則</h3>
+      <p class="text-xs text-gray-500 mb-4">每行輸入一個項目，系統自動去重</p>
+      <textarea x-model="newContent" rows="6" placeholder="spam@example.com&#10;bad@domain.com" class="w-full px-4 py-3 rounded-xl text-sm"></textarea>
       <div class="flex justify-end gap-3 mt-6">
         <button @click="showAddModal=false;newContent=''" class="btn-gray px-5 py-2 rounded-lg text-sm">取消</button>
         <button @click="addItem()" class="btn-cyan px-7 py-2 rounded-lg text-sm font-bold">確認新增</button>
@@ -146,6 +181,8 @@ const API = "https://mail-kv-filter-admin.gdsh.workers.dev";
 
 function app() {
   return {
+    page: 'login',
+    password: '', loggingIn: false, loginError: '',
     tabs: [
       { id: 'blacklist:email', name: '🚫 郵件黑名單' },
       { id: 'blacklist:domain', name: '🌐 網域黑名單' },
@@ -159,22 +196,60 @@ function app() {
     searchQuery: '', isSearching: false,
 
     get currentTabName() {
-      if (this.isSearching) return 'SEARCH RESULTS';
+      if (this.isSearching) return 'GLOBAL SEARCH RESULTS';
       return this.tabs.find(t => t.id === this.currentTab)?.name;
     },
 
-    init() { this.loadData(); },
+    async init() {
+      // Check if already logged in
+      const j = await this.callApi('/api/list?type=blacklist:email&page=1');
+      if (j?.success) {
+        this.items = j.data;
+        this.pagination = j.pagination;
+        this.page = 'dashboard';
+      }
+    },
 
-    async api(path, opts = {}) {
-      const res = await fetch(API + path, { credentials: 'include', ...opts });
-      if (res.status === 401) { alert('請先登入 Worker 取得認證'); return null; }
-      return res.json();
+    async callApi(path, opts = {}) {
+      try {
+        const res = await fetch(API + path, { credentials: 'include', ...opts });
+        if (res.status === 401) return null;
+        return res.json();
+      } catch { return null; }
+    },
+
+    async login() {
+      if (!this.password) return;
+      this.loggingIn = true; this.loginError = '';
+      try {
+        const res = await fetch(API + '/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: this.password }),
+          credentials: 'include'
+        });
+        const j = await res.json();
+        if (j.success) {
+          this.page = 'dashboard';
+          this.password = '';
+          await this.loadData();
+        } else {
+          this.loginError = '密碼錯誤，請再試一次';
+        }
+      } catch { this.loginError = '無法連接至伺服器'; }
+      this.loggingIn = false;
+    },
+
+    async logout() {
+      await fetch(API + '/logout', { credentials: 'include' });
+      this.page = 'login'; this.items = []; this.password = '';
     },
 
     async loadData() {
       if (this.isSearching) return;
-      const j = await this.api(`/api/list?type=${this.currentTab}&page=${this.pagination.page}`);
+      const j = await this.callApi(`/api/list?type=${this.currentTab}&page=${this.pagination.page}`);
       if (j?.success) { this.items = j.data; this.pagination = j.pagination; }
+      else if (j === null) { this.page = 'login'; }
     },
 
     async switchTab(id) { this.currentTab = id; this.isSearching = false; this.searchQuery = ''; this.pagination.page = 1; await this.loadData(); },
@@ -183,40 +258,44 @@ function app() {
     async performSearch() {
       if (!this.searchQuery.trim()) { this.isSearching = false; return this.loadData(); }
       this.isSearching = true;
-      const j = await this.api('/api/search', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({query:this.searchQuery}) });
+      const j = await this.callApi('/api/search', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({query:this.searchQuery}) });
       if (j?.success) { this.items = j.data; this.pagination = { page:1, limit:50, total:j.data.length, totalPages:1 }; }
     },
 
     async addItem() {
-      const j = await this.api('/api/add', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({type:this.currentTab, content:this.newContent}) });
-      if (j?.success) { this.showAddModal=false; this.newContent=''; await this.loadData(); alert(`新增完成！已新增 ${j.stats.added} 筆，跳過重複 ${j.stats.skipped} 筆`); }
+      const j = await this.callApi('/api/add', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({type:this.currentTab, content:this.newContent}) });
+      if (j?.success) {
+        this.showAddModal = false; this.newContent = '';
+        await this.loadData();
+        alert(`✅ 新增完成！已新增 ${j.stats.added} 筆，跳過重複 ${j.stats.skipped} 筆`);
+      }
     },
 
     async deleteItem(id) {
       if (!confirm('確定要刪除這筆記錄？')) return;
-      const j = await this.api('/api/delete', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({id}) });
+      const j = await this.callApi('/api/delete', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({id}) });
       if (j?.success) this.isSearching ? await this.performSearch() : await this.loadData();
     },
 
     async deployToKV(minId=0) {
+      if (minId===0 && !confirm('啟動智慧指標同步：將 D1 資料部署至 KV？')) return;
       this.deploying = true;
-      const j = await this.api('/api/deploy', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({type:this.currentTab, minId}) });
+      const j = await this.callApi('/api/deploy', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({type:this.currentTab, minId}) });
       if (j?.success) {
         if (j.hasMore) setTimeout(()=>this.deployToKV(j.nextMinId), 1000);
-        else { alert('智慧部署完成！差異資料已發送至背景佇列。'); this.deploying=false; }
-      } else { this.deploying=false; if(j) alert('錯誤：' + j.error); }
+        else { alert('✅ 智慧部署完成！差異資料已送至背景佇列。'); this.deploying=false; }
+      } else { this.deploying=false; if(j?.error) alert('錯誤：'+j.error); }
     },
 
     async importFromKV(cursor='') {
+      if (!cursor && !confirm('從 KV 匯入資料至 D1？')) return;
       this.importing = true;
-      const j = await this.api(`/api/import?cursor=${cursor}`, { method:'POST' });
+      const j = await this.callApi(`/api/import?cursor=${cursor}`, { method:'POST' });
       if (j?.success) {
-        if (!j.complete) setTimeout(()=>this.importFromKV(j.cursor), 1000);
-        else { alert('KV 匯入掃描完成！'); this.importing=false; await this.loadData(); }
+        if (!j.complete && j.cursor) setTimeout(()=>this.importFromKV(j.cursor), 1000);
+        else { alert('✅ KV 匯入掃描完成！'); this.importing=false; await this.loadData(); }
       } else { this.importing=false; }
-    },
-
-    logout() { window.location.href = API + '/logout'; }
+    }
   };
 }
 </script>
