@@ -1,0 +1,232 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+---
+
+<StarlightPage frontmatter={{ 
+  title: '系統控制台', 
+  template: 'splash',
+  hero: {
+    tagline: '即時監控與規則管理',
+    actions: [
+      { text: '返回首頁', link: '/', icon: 'left-arrow' }
+    ]
+  }
+}}>
+  <div id="dashboard-app" x-data="app()" x-init="init()" class="cyber-dashboard mt-8">
+    
+    <!-- 頂部狀態列 -->
+    <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 bg-slate-900/50 p-4 rounded-xl border border-cyan-500/20">
+        <div class="flex gap-2 overflow-x-auto pb-2 w-full md:w-auto">
+            <template x-for="tab in tabs" :key="tab.id">
+                <button @click="switchTab(tab.id)" 
+                  :class="currentTab === tab.id ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500' : 'text-gray-400 border-transparent hover:border-gray-700'"
+                  class="px-4 py-2 rounded-lg text-sm font-bold border transition-all whitespace-nowrap" x-text="tab.name"></button>
+            </template>
+        </div>
+        
+        <div class="flex gap-2">
+           <button @click="() => importFromKV()" :disabled="importing || deploying" 
+             class="px-4 py-2 bg-slate-800 text-gray-300 rounded-lg text-sm font-bold hover:bg-slate-700 disabled:opacity-50">
+             <span x-text="importing ? '⏳ 佇列中...' : '📥 從 KV 匯入'"></span>
+           </button>
+           <button @click="deployToKV()" :disabled="importing || deploying"
+             class="px-4 py-2 bg-pink-600/20 text-pink-400 border border-pink-500/50 rounded-lg text-sm font-bold hover:bg-pink-600 hover:text-white transition-all disabled:opacity-50">
+             <span x-text="deploying ? '⏳ 部署中...' : '🚀 部署至 KV'"></span>
+           </button>
+        </div>
+    </div>
+
+    <!-- 搜尋與統計 -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="md:col-span-2 relative">
+            <input type="text" x-model="searchQuery" @keydown.enter="performSearch" placeholder="搜尋資料庫關鍵字..." 
+              class="w-full bg-black/40 border border-slate-700 rounded-xl px-4 py-3 text-cyan-400 focus:border-cyan-500 outline-none transition-all">
+            <button @click="performSearch" class="absolute right-4 top-3.5 text-slate-500 hover:text-cyan-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </button>
+        </div>
+        <button @click="showAddModal = true" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-cyan-900/20 transition-all">
+            + 新增規則
+        </button>
+    </div>
+
+    <!-- 資料表格 -->
+    <div class="bg-slate-900/40 backdrop-blur-md border border-slate-800 rounded-2xl overflow-hidden">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="border-b border-slate-800 bg-slate-800/30">
+                    <th class="px-6 py-4 text-xs font-bold text-cyan-500 uppercase tracking-wider">ID</th>
+                    <th class="px-6 py-4 text-xs font-bold text-cyan-500 uppercase tracking-wider">內容 (Value)</th>
+                    <th class="px-6 py-4 text-xs font-bold text-cyan-500 uppercase tracking-wider">紀錄/日期</th>
+                    <th class="px-6 py-4 text-right text-xs font-bold text-cyan-500 uppercase tracking-wider">操作</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800">
+                <template x-for="item in items" :key="item.id">
+                    <tr class="hover:bg-cyan-500/5 transition-colors">
+                        <td class="px-6 py-4 text-sm text-slate-500 font-mono" x-text="item.id"></td>
+                        <td class="px-6 py-4 text-sm text-white font-medium" x-text="item.value"></td>
+                        <td class="px-6 py-4 text-sm text-slate-400" x-text="item.note"></td>
+                        <td class="px-6 py-4 text-right">
+                            <button @click="deleteItem(item.id)" class="text-pink-500 hover:text-pink-400 font-bold text-xs">刪除</button>
+                        </td>
+                    </tr>
+                </template>
+                <template x-if="items.length === 0">
+                    <tr>
+                        <td colspan="4" class="px-6 py-12 text-center text-slate-600 italic">目前沒有符合條件的資料</td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 彈出視窗 (Add Modal) -->
+    <div x-show="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" x-cloak>
+        <div class="bg-slate-900 border border-slate-700 p-8 rounded-2xl w-full max-w-lg shadow-2xl">
+            <h3 class="text-xl font-bold text-white mb-6">新增過濾規則</h3>
+            <textarea x-model="newContent" rows="5" class="w-full bg-black/50 border border-slate-700 rounded-xl p-4 text-white outline-none focus:border-cyan-500" placeholder="每行輸入一個項目..."></textarea>
+            <div class="flex justify-end gap-3 mt-6">
+                <button @click="showAddModal = false" class="px-6 py-2 text-slate-400 hover:text-white">取消</button>
+                <button @click="addItem()" class="px-8 py-2 bg-cyan-600 text-white rounded-lg font-bold">確認新增</button>
+            </div>
+        </div>
+    </div>
+
+  </div>
+
+  <!-- 引入 Alpine.js -->
+  <script is:inline src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  
+  <script is:inline>
+    // 配置 API 網址 (請修改為您的 Worker 實際網址)
+    const API_BASE = "https://mail-kv-filter-admin.gdsh.workers.dev";
+
+    function app() {
+      return {
+        tabs: [
+          { id: 'blacklist:email', name: '🚫 郵件黑名單' },
+          { id: 'blacklist:domain', name: '🌐 網域黑名單' },
+          { id: 'blacklist:target', name: '🎯 目標攔攔截' },
+          { id: 'whitelist:email', name: '✅ 白名單' }
+        ],
+        currentTab: 'blacklist:email',
+        items: [],
+        pagination: { page: 1, limit: 20, total: 0, totalPages: 1 },
+        showAddModal: false,
+        newContent: '',
+        deploying: false,
+        importing: false,
+        searchQuery: '',
+        isSearching: false,
+
+        init() { this.loadData(); },
+
+        async switchTab(tabId) {
+          this.currentTab = tabId;
+          this.isSearching = false;
+          await this.loadData();
+        },
+
+        async loadData() {
+          try {
+            const res = await fetch(`${API_BASE}/api/list?type=${this.currentTab}`, { credentials: 'include' });
+            const json = await res.json();
+            if (json.success) {
+              this.items = json.data;
+              this.pagination = json.pagination;
+            } else if (res.status === 401) {
+              alert("認證過期，請重新登入 (未來將跳轉至登入頁)");
+            }
+          } catch(e) { console.error("加載失敗", e); }
+        },
+
+        async performSearch() {
+          if (!this.searchQuery.trim()) {
+            this.isSearching = false;
+            return this.loadData();
+          }
+          this.isSearching = true;
+          try {
+            const res = await fetch(`${API_BASE}/api/search`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ query: this.searchQuery }),
+              credentials: 'include'
+            });
+            const json = await res.json();
+            if(json.success) this.items = json.data;
+          } catch(e) { alert('搜尋異常'); }
+        },
+
+        async addItem() {
+          try {
+            const res = await fetch(`${API_BASE}/api/add`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ type: this.currentTab, content: this.newContent }),
+              credentials: 'include'
+            });
+            const json = await res.json();
+            if (json.success) {
+              this.showAddModal = false;
+              this.newContent = '';
+              await this.loadData();
+            }
+          } catch(e) { alert('新增失敗'); }
+        },
+
+        async deleteItem(id) {
+          if (!confirm('確定要刪除嗎？')) return;
+          try {
+            const res = await fetch(`${API_BASE}/api/delete`, { 
+              method: 'POST', 
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ id }),
+              credentials: 'include'
+            });
+            const json = await res.json();
+            if (json.success) await this.loadData();
+          } catch(e) { alert('刪除失敗'); }
+        },
+
+        async deployToKV(minId = 0) {
+          this.deploying = true;
+          try {
+            const res = await fetch(`${API_BASE}/api/deploy`, { 
+              method: 'POST', 
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ type: this.currentTab, minId }),
+              credentials: 'include'
+            });
+            const json = await res.json();
+            if (json.success) {
+              if (json.hasMore) setTimeout(() => this.deployToKV(json.nextMinId), 1000);
+              else { alert('智慧部署掃描完成！'); this.deploying = false; }
+            }
+          } catch(e) { this.deploying = false; }
+        },
+
+        async importFromKV(cursor = "") {
+          this.importing = true;
+          try {
+            const res = await fetch(`${API_BASE}/api/import?cursor=${cursor}`, { method: 'POST', credentials: 'include' });
+            const json = await res.json();
+            if (json.success) {
+              if (!json.complete) setTimeout(() => this.importFromKV(json.cursor), 1000);
+              else { alert('KV 匯入任務已全部發送！'); this.importing = false; await this.loadData(); }
+            }
+          } catch(e) { this.importing = false; }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .cyber-dashboard {
+      font-family: 'Century Gothic', sans-serif;
+      color: #e2e8f0;
+    }
+    [x-cloak] { display: none !important; }
+  </style>
+</StarlightPage>

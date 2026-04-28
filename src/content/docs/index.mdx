@@ -1,0 +1,34 @@
+---
+title: Mail Filter Admin
+description: 專業的郵件過濾管理系統
+template: splash
+hero:
+  tagline: 基於 Cloudflare Workers + D1 + KV 的高效能過濾方案
+  actions:
+    - text: 進入控制台
+      link: /dashboard
+      icon: right-arrow
+      variant: primary
+    - text: 查看文檔
+      link: /guides/usage
+      icon: external
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## 系統特色
+
+<CardGrid settle>
+	<Card title="智慧同步" icon="pencil">
+		自動比對 D1 與 KV 差異，極大化節省 Queue 額度。
+	</Card>
+	<Card title="高效過濾" icon="add-document">
+		支援電子郵件、網域及目標 BCC 的多重攔截。
+	</Card>
+	<Card title="現代化介面" icon="setting">
+		採用 Astro Starlight 驅動的響應式管理後台。
+	</Card>
+	<Card title="安全可靠" icon="read-book">
+		完整的認證機制與跨域保護。
+	</Card>
+</CardGrid>
