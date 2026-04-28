@@ -5,6 +5,7 @@ export default defineConfig({
   integrations: [
     starlight({
       title: 'Mail Filter Admin',
+      sitemap: false,
       sidebar: [
         { label: '首頁', link: '/' },
         { label: '控制台', link: '/dashboard' },
